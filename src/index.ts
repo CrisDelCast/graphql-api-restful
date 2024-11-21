@@ -8,8 +8,24 @@ import { router as commentRouter } from './routes/commentRoutes';
 import { router as reactionRouter } from './routes/reactionRoutes';
 import { ApolloServer } from 'apollo-server-express';
 import { reactionTypeDefs } from './graphql/schemas/reaction.schema';
+import { commentTypeDefs } from './graphql/schemas/comment.schema';
+import { userTypeDefs } from './graphql/schemas/user.schema';
 import { reactionResolvers } from './graphql/resolvers/reaction.resolver';
+import { commentResolvers } from './graphql/resolvers/comment.resolver';
+import { userResolvers } from './graphql/resolvers/user.resolver';
+import { mergeTypeDefs, mergeResolvers} from '@graphql-tools/merge';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+
 dotenv.config();
+
+const typeDefs = mergeTypeDefs([reactionTypeDefs, commentTypeDefs, userTypeDefs]);
+const resolvers = mergeResolvers([reactionResolvers, commentResolvers, userResolvers]);
+
+const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers,
+  });
+
 
 class Server {
   private app: Express;
@@ -28,8 +44,7 @@ class Server {
   private async initApolloServer(): Promise<void> {
     try {
       this.apolloServer = new ApolloServer({
-        typeDefs: [reactionTypeDefs],
-        resolvers: [reactionResolvers],
+        schema
     });
       await this.apolloServer.start();
       (this.apolloServer as any).applyMiddleware({ app: this.app });
