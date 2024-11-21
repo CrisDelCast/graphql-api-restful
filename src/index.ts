@@ -8,14 +8,12 @@ import { router as commentRouter } from './routes/commentRoutes';
 import { router as reactionRouter } from './routes/reactionRoutes';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from "@graphql-tools/schema";
-// import { typeDefs } from './schema';
-// import { resolvers } from './resolvers';
+import { reactionTypeDefs } from './graphql/schemas/reaction.schema';
+import { reactionResolvers } from './graphql/resolvers/reaction.resolver';
 dotenv.config();
 
 const typeDefs = `
-  type Query {
-    hello: String
-  }
+  reactionTypeDefs
 `;
 
 const resolvers = {
@@ -42,7 +40,10 @@ class Server {
   // Initialize Apollo Server
   private async initApolloServer(): Promise<void> {
     try {
-      this.apolloServer = new ApolloServer({schema});
+      this.apolloServer = new ApolloServer({
+        typeDefs: [reactionTypeDefs],
+        resolvers: [reactionResolvers],
+    });
       await this.apolloServer.start();
       (this.apolloServer as any).applyMiddleware({ app: this.app });
       console.log(`GraphQL endpoint ready at ${this.apolloServer.graphqlPath}`);
