@@ -222,9 +222,7 @@ El servidor se ejecutará en `http://localhost:3000`.
 #### Eliminar una reaccion 
 
     mutation DeleteReaction {
-    deleteReaction(id: "reaction123") {  # Reemplaza con el ID de la reacción a eliminar
-        id
-    }
+    deleteReaction(id: "reaction123") 
     }
 
 
@@ -267,10 +265,7 @@ El servidor se ejecutará en `http://localhost:3000`.
         id
         title
         content
-        author {
-        id
-        name
-        }
+        author 
         createdAt
         updatedAt
     }
@@ -287,10 +282,7 @@ El servidor se ejecutará en `http://localhost:3000`.
         id
         title
         content
-        author {
-        id
-        name
-        }
+        author
         createdAt
         updatedAt
     }
@@ -299,9 +291,7 @@ El servidor se ejecutará en `http://localhost:3000`.
 #### Eliminar Post
 
     mutation DeletePost {
-    deletePost(id: "post123") { 
-        id
-    }
+    deletePost(id: "post123")
     }
 
 #### Obtener todos los Post
@@ -311,10 +301,7 @@ El servidor se ejecutará en `http://localhost:3000`.
         id
         title
         content
-        author {
-        id
-        name
-        }
+        author 
         createdAt
         updatedAt
     }
@@ -328,16 +315,71 @@ El servidor se ejecutará en `http://localhost:3000`.
         id
         title
         content
-        author {
-        id
-        name
-        }
+        author 
         createdAt
         updatedAt
     }
     }
+### Fragments:
 
-Gracias
+# Fragmento para los campos básicos de un usuario
+
+    fragment UserFields on User {
+    id
+    name
+    email
+    role
+    createdAt
+    updatedAt
+    }
+
+# Fragmento para los campos básicos de un comentario
+
+    fragment CommentFields on Comment {
+    id
+    content
+    userId
+    parentId
+    createdAt
+    updatedAt
+    }
+
+# Fragmento para los campos básicos de una reacción
+
+    fragment ReactionFields on Reaction {
+    id
+    type
+    userId
+    commentId
+    createdAt
+    updatedAt
+    }
+
+# Fragmento para los campos básicos de un post
+
+    fragment PostFields on Post {
+    id
+    title
+    content
+    author
+    createdAt
+    updatedAt
+    }
+
+# Recordatorio
+
+    los fragments deben tener al final
+
+    ejemplo: 
+    
+    query GetReactions{
+        getReactions {
+            ...ReactionFields
+            
+        } 
+    }
+        
+
 
 
 
