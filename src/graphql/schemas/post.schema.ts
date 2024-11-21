@@ -6,7 +6,7 @@ type Post {
     id: ID!
     title: String!
     content: String!
-    author: User!  # Relación con el modelo User
+    author: String!  # Relación con el modelo User
     createdAt: String!
     updatedAt: String!
 }
