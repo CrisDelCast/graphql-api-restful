@@ -1,4 +1,4 @@
-import Reaction, { ReactionDocument } from '../models/Reaction';
+import Reaction, { ReactionDocument } from '../../models/reactionModel';
 
 export const reactionResolvers = {
     Query: {

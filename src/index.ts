@@ -7,22 +7,9 @@ import { router as postRouter } from './routes/postRoutes';
 import { router as commentRouter } from './routes/commentRoutes';
 import { router as reactionRouter } from './routes/reactionRoutes';
 import { ApolloServer } from 'apollo-server-express';
-import { makeExecutableSchema } from "@graphql-tools/schema";
 import { reactionTypeDefs } from './graphql/schemas/reaction.schema';
 import { reactionResolvers } from './graphql/resolvers/reaction.resolver';
 dotenv.config();
-
-const typeDefs = `
-  reactionTypeDefs
-`;
-
-const resolvers = {
-  Query: {
-    hello: () => "Hello, GraphQL with TypeScript!",
-  },
-};
-
-const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 class Server {
   private app: Express;
