@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 // Interfaz para los datos de entrada de un usuario
 export interface UserInput {
@@ -61,12 +62,27 @@ const userSchema = new Schema<UserDocument>(
     }
 );
 
-// Middleware de Mongoose para limpieza antes de guardar
-userSchema.pre('save', function (next) {
+// Middleware de Mongoose para limpiar y normalizar los datos antes de guardar
+userSchema.pre('save', async function (next) {
+    // Normalización del email
+    this.email = this.email.trim().toLowerCase();
+    
+    // Hash de la contraseña antes de guardarla
+    if (this.isModified('password')) {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
+
+    // Normalizar el nombre
     this.name = this.name.trim();
-    this.email = this.email.trim().toLowerCase(); // Normalización del email
+    
     next();
 });
+
+// Método para comparar la contraseña ingresada con la almacenada (para login)
+userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
 // Creación del modelo de Mongoose
 const User: Model<UserDocument> = mongoose.model<UserDocument>('User', userSchema);

@@ -25,8 +25,7 @@ const PostSchema: Schema = new Schema(
       required: true,
     },
     author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Relación con el modelo de usuario
+      type: String, // Relación con el modelo de usuario
       required: true,
     }
   },

@@ -25,4 +25,19 @@ input UserInput {
   password: String!
   role: String
 }
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthPayload
+}
+
 `;

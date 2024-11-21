@@ -106,7 +106,7 @@ class UserService {
                 name: user.name,    // Nombre del usuario
                 deviceId: deviceId  // Identificador único para la sesión o dispositivo
             };
-            const secret = process.env.JWT_SECRET || "default_secret_key";  // Clave secreta
+            const secret = process.env.JWT_SECRET || "secret";  // Clave secreta
             const options = { expiresIn: "1h" };  // Puedes personalizar el tiempo de expiración aquí
 
             // Generar y devolver el token firmado
