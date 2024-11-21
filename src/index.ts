@@ -1,14 +1,13 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-
-// Configuración de base de datos y enrutadores
 import db from './config/db';
 import { router as userRouter } from './routes/userRoutes';
 import { router as postRouter } from './routes/postRoutes';
 import { router as commentRouter } from './routes/commentRoutes';
 import { router as reactionRouter } from './routes/reactionRoutes';
+import { graphqlHTTP } from 'express-graphql';
+import { buildSchema } from 'graphql';
 
-// Configurar dotenv
 dotenv.config();
 
 class Server {
@@ -31,6 +30,7 @@ class Server {
 
     // Configuración de rutas
     private routes(): void {
+        // Rutas REST
         this.app.get('/', (req: Request, res: Response) => {
             res.send('Hello World');
         });
@@ -39,6 +39,43 @@ class Server {
         this.app.use('/api/users', userRouter);
         this.app.use('/api/comments', commentRouter);
         this.app.use('/api/reactions', reactionRouter);
+
+        // Ruta para GraphQL
+        this.app.use(
+            '/graphql',
+            graphqlHTTP({
+                schema: this.graphqlSchema(),
+                rootValue: this.graphqlResolvers(),
+                graphiql: true, // Habilitar GraphiQL para pruebas
+            })
+        );
+    }
+
+    // Definición del esquema de GraphQL
+    private graphqlSchema() {
+        return buildSchema(`
+            type Query {
+                hello: String
+                users: [String]
+            }
+
+            type Mutation {
+                addUser(name: String!): String
+            }
+        `);
+    }
+
+    // Definición de resolvers de GraphQL
+    private graphqlResolvers() {
+        const users: string[] = [];
+        return {
+            hello: () => '¡Hola desde GraphQL!',
+            users: () => users,
+            addUser: ({ name }: { name: string }) => {
+                users.push(name);
+                return `Usuario ${name} agregado con éxito.`;
+            },
+        };
     }
 
     // Middleware de manejo de errores
@@ -56,6 +93,7 @@ class Server {
             console.log('Database connected successfully');
             this.app.listen(this.port, () => {
                 console.log(`Server is running on port ${this.port}`);
+                console.log(`GraphQL is available at http://localhost:${this.port}/graphql`);
             });
         } catch (err) {
             console.error('Failed to connect to the database:', err);
