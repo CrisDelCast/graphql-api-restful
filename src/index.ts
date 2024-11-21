@@ -1,21 +1,20 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import db from './config/db';
+import { ApolloServer, gql } from 'apollo-server-express';
+import db from './config/db';  // Asegúrate de que db esté configurado correctamente
 import { router as userRouter } from './routes/userRoutes';
 import { router as postRouter } from './routes/postRoutes';
 import { router as commentRouter } from './routes/commentRoutes';
 import { router as reactionRouter } from './routes/reactionRoutes';
-import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
 
 dotenv.config();
 
 class Server {
-    private app: Express;
+    private app: express.Application;  // Usamos 'express.Application'
     private port: number | string;
 
     constructor() {
-        this.app = express();
+        this.app = express();  // Inicializamos Express correctamente
         this.port = process.env.PORT || 3000;
         this.middlewares();
         this.routes();
@@ -40,20 +39,13 @@ class Server {
         this.app.use('/api/comments', commentRouter);
         this.app.use('/api/reactions', reactionRouter);
 
-        // Ruta para GraphQL
-        this.app.use(
-            '/graphql',
-            graphqlHTTP({
-                schema: this.graphqlSchema(),
-                rootValue: this.graphqlResolvers(),
-                graphiql: true, // Habilitar GraphiQL para pruebas
-            })
-        );
+        // Ruta para GraphQL usando Apollo Server
+        this.createApolloServer().applyMiddleware({ app: this.app, path: '/graphql' });
     }
 
-    // Definición del esquema de GraphQL
-    private graphqlSchema() {
-        return buildSchema(`
+    // Definición del esquema y resolvers de GraphQL
+    private createApolloServer() {
+        const typeDefs = gql`
             type Query {
                 hello: String
                 users: [String]
@@ -62,20 +54,26 @@ class Server {
             type Mutation {
                 addUser(name: String!): String
             }
-        `);
-    }
+        `;
 
-    // Definición de resolvers de GraphQL
-    private graphqlResolvers() {
-        const users: string[] = [];
-        return {
-            hello: () => '¡Hola desde GraphQL!',
-            users: () => users,
-            addUser: ({ name }: { name: string }) => {
-                users.push(name);
-                return `Usuario ${name} agregado con éxito.`;
+        const resolvers = {
+            Query: {
+                hello: () => '¡Hola desde GraphQL!',
+                users: () => ['Usuario1', 'Usuario2'],
+            },
+            Mutation: {
+                addUser: (_: any, { name }: { name: string }) => {
+                    return `Usuario ${name} agregado con éxito.`;
+                },
             },
         };
+
+        const server = new ApolloServer({
+            typeDefs,
+            resolvers,
+        });
+
+        return server;
     }
 
     // Middleware de manejo de errores
