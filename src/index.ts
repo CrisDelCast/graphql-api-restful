@@ -10,16 +10,18 @@ import { ApolloServer } from 'apollo-server-express';
 import { reactionTypeDefs } from './graphql/schemas/reaction.schema';
 import { commentTypeDefs } from './graphql/schemas/comment.schema';
 import { userTypeDefs } from './graphql/schemas/user.schema';
+import { postTypeDefs } from './graphql/schemas/post.schema';
 import { reactionResolvers } from './graphql/resolvers/reaction.resolver';
 import { commentResolvers } from './graphql/resolvers/comment.resolver';
 import { userResolvers } from './graphql/resolvers/user.resolver';
+import { postResolvers } from './graphql/resolvers/post.resolver';
 import { mergeTypeDefs, mergeResolvers} from '@graphql-tools/merge';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
 dotenv.config();
 
-const typeDefs = mergeTypeDefs([reactionTypeDefs, commentTypeDefs, userTypeDefs]);
-const resolvers = mergeResolvers([reactionResolvers, commentResolvers, userResolvers]);
+const typeDefs = mergeTypeDefs([reactionTypeDefs, commentTypeDefs, userTypeDefs,postTypeDefs]);
+const resolvers = mergeResolvers([reactionResolvers, commentResolvers, userResolvers,postResolvers]);
 
 const schema = makeExecutableSchema({
     typeDefs,

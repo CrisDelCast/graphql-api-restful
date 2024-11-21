@@ -1,23 +1,50 @@
 import User, { UserDocument, UserInput } from '../../models/userModel';
+import { ApolloError } from 'apollo-server-express'; 
 
 export const userResolvers = {
   Query: {
-    // Resolver para obtener un usuario por ID
     async getUserById(_: any, { id }: { id: string }) {
-      return await User.findById(id);
+      try {
+        const user = await User.findById(id);
+        if (!user) {
+          throw new ApolloError('User not found', 'USER_NOT_FOUND', { id });
+        }
+        return user;
+      } catch (error: unknown) {
+        if (error instanceof ApolloError) {
+          throw error; 
+        }
+        if (error instanceof Error) {
+          throw new ApolloError('Error fetching user by ID', 'FETCH_USER_ERROR', { error: error.message });
+        }
+        throw new ApolloError('An unexpected error occurred', 'UNEXPECTED_ERROR');
+      }
     },
-    // Resolver para obtener todos los usuarios
+
     async getUsers() {
-      return await User.find();
+      try {
+        return await User.find();
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new ApolloError('Error fetching users', 'FETCH_USERS_ERROR', { error: error.message });
+        }
+        throw new ApolloError('An unexpected error occurred', 'UNEXPECTED_ERROR');
+      }
     },
   },
 
   Mutation: {
-    // Resolver para crear un nuevo usuario
     async createUser(_: any, { input }: { input: UserInput }) {
-      const newUser = new User(input);
-      await newUser.save();
-      return newUser;
+      try {
+        const newUser = new User(input);
+        await newUser.save();
+        return newUser;
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new ApolloError('Error creating user', 'CREATE_USER_ERROR', { error: error.message });
+        }
+        throw new ApolloError('An unexpected error occurred', 'UNEXPECTED_ERROR');
+      }
     },
   },
 };
